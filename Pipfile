@@ -10,6 +10,7 @@ black = "*"
 [packages]
 bs4 = "*"
 pandas = "*"
+lxml = "*"
 
 [requires]
 python_version = "3.7"
