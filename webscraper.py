@@ -67,9 +67,7 @@ for seite in range(1, 1600):
             print("ID " + str(item) + " entfernt.")
     print("Exportiert CSV")
     df.to_csv(
-        ".../rohdaten/"
-        + str(datetime.now())[:19].replace(":", "").replace(".", "")
-        + ".csv",
+        "./CSVs/" + str(datetime.now())[:19].replace(":", "").replace(".", "") + ".csv",
         sep=";",
         decimal=",",
         encoding="utf-8",
