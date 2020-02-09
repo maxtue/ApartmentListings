@@ -1,3 +1,4 @@
 {
-    "python.pythonPath": "/Users/max/.local/share/virtualenvs/ImmoScoutScraper-t6JEhfhY/bin/python"
+    "python.pythonPath": "/Users/max/.local/share/virtualenvs/ImmoScoutScraper-t6JEhfhY/bin/python",
+    "editor.formatOnSave": true
 }
