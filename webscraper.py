@@ -5,7 +5,7 @@ from datetime import datetime
 import pandas as pd
 import json
 
-for seite in range(1, 3000):
+for seite in range(1, 1600):
 
     print("Loop " + str(seite) + " startet.")
 
@@ -16,17 +16,15 @@ for seite in range(1, 3000):
 
         soup = bs.BeautifulSoup(
             urllib.request.urlopen(
-                "https://www.immobilienscout24.de/Suche/S-2/P-"
+                "https://www.immobilienscout24.de/Suche/de/wohnung-kaufen?pagenumber="
                 + str(seite)
-                + "/Haus-Kauf"
             ).read(),
             "lxml",
         )
         print(
             "Aktuelle Seite: "
-            + "https://www.immobilienscout24.de/Suche/S-2/P-"
+            + "https://www.immobilienscout24.de/Suche/de/wohnung-kaufen?pagenumber="
             + str(seite)
-            + "/Haus-Kauf"
         )
         for paragraph in soup.find_all("a"):
 
