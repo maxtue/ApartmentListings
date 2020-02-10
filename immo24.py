@@ -10,16 +10,18 @@ class Immo24scrape:
     def __init__(self, filename="rawdata.csv", savepath="./data/", numpages=1000):
         self.filename = filename
         self.savepath = savepath
-        self.filepath = filename + savepath
+        self.filepath = savepath + filename
         self.numpages = numpages
 
-    def get_data(self):
+    def scrape_data(self):
         # iterate over result pages showing 20 results each
         for page in range(1, self.numpages):
             self.page = page
-            print(f"Scraping results from page {self.page} of {self.numpages}.")
-            # scrape data from every individual result page
+            print(f"Scraping results from page {self.page}/{self.numpages}.")
+            # scrape links to exposes from every individual result page
             self.get_pagelinks()
+            self.get_pagedata()
+            self.write_pagedata()
 
     def get_pagelinks(self):
         self.links = []
@@ -40,9 +42,9 @@ class Immo24scrape:
             self.links = list(set(self.links))
 
     def get_pagedata(self):
-        self.pagedata = pd.DataFrame
+        self.pagedata = pd.DataFrame()
         # get data from every expose link
-        for link in self.links():
+        for link in self.links:
             # use urllib.request and Beautiful soup to extract data
             soup = bs.BeautifulSoup(
                 urllib.request.urlopen(
@@ -50,38 +52,32 @@ class Immo24scrape:
                 ).read(),
                 "lxml",
             )
-            # extract features from data
-            self.pagedata = pd.DataFrame(
+            # extract features
+            linkdata = pd.DataFrame(
                 json.loads(
                     str(soup.find_all("script")).split("keyValues = ")[1].split("}")[0]
                     + str("}")
                 ),
                 index=[str(datetime.now())],
             )
-            # extract expose texts from data
-            self.pagedata["URL"] = str(link)
-            expose_descriptions = []
-            for description in soup.find_all("pre"):
-                # extract text without html-markers
-                expose_descriptions.append(description.text)
-            # add column to dataframe
-            self.pagedata["Exposes"] = str(expose_descriptions)
+            # save URL as unique identifier
+            linkdata["URL"] = str(link)
+            self.pagedata = self.pagedata.append(linkdata)
 
     def write_pagedata(self):
-        print("Appending data of page {self.page} to {self.filepath}")
-        self.pagedata.to_csv(
-            self.filepath,
-            # append data
-            mode="a",
-            # only create header if file is newly created
-            header=self.filepath.tell() == 0,
-            sep=";",
-            decimal=",",
-            encoding="utf-8",
-            index_label="timestamp",
-        )
+        print(f"Appending data of page {self.page} to {self.filepath}")
+        with open(self.filepath, "a") as f:
+            self.pagedata.to_csv(
+                f,
+                # only create header if file is newly created
+                header=f.tell() == 0,
+                sep=";",
+                decimal=",",
+                encoding="utf-8",
+                index_label="timestamp",
+            )
 
 
 if __name__ == "__main__":
     dataset = Immo24scrape()
-    dataset.get_data()
+    dataset.scrape_data()
