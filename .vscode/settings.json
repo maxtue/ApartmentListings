@@ -1,5 +1,0 @@
-{
-    "python.pythonPath": "/Users/max/.local/share/virtualenvs/code-XMyLcZ05/bin/python",
-    "python.formatting.provider": "black",
-    "editor.formatOnSave": true
-}
