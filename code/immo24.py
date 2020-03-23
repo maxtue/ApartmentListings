@@ -7,7 +7,7 @@ import json
 
 
 class Immo24scrape:
-    def __init__(self, filename="rawdata.csv", savepath="./data/", numpages=1000):
+    def __init__(self, filename="rawdata" + + "".csv", savepath="../data/", numpages=1000):
         self.filename = filename
         self.savepath = savepath
         self.filepath = savepath + filename
