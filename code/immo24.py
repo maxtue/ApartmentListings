@@ -1,5 +1,6 @@
 import bs4 as bs
 import urllib.request
+from urllib.error import URLError, HTTPError
 from datetime import date
 from datetime import datetime
 import pandas as pd
@@ -25,7 +26,7 @@ class Immo24scrape:
                 self.get_pagedata()
                 self.write_pagedata()
             # catch urllib error after last page has been reached
-            except IOError:
+            except (URLError, HTTPError):
                 print(f"Number of scraped pages today: {self.page}")
                 break
             self.page += 1
