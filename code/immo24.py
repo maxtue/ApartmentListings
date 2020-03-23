@@ -1,29 +1,37 @@
 import bs4 as bs
 import urllib.request
-import time
+from datetime import date
 from datetime import datetime
 import pandas as pd
 import json
 
 
 class Immo24scrape:
-    def __init__(self, filename="rawdata" + + "".csv", savepath="../data/", numpages=1000):
+    def __init__(
+        self, filename="rawdata" + str(date.today()) + ".csv", savepath="../data/",
+    ):
         self.filename = filename
         self.savepath = savepath
         self.filepath = savepath + filename
-        self.numpages = numpages
 
     def scrape_data(self):
-        # iterate over result pages showing 20 results each
-        for page in range(1, self.numpages):
-            self.page = page
-            print(f"Scraping results from page {self.page}/{self.numpages}.")
-            # scrape links to exposes from every individual result page
-            self.get_pagelinks()
-            self.get_pagedata()
-            self.write_pagedata()
+        # iterate over all available result pages showing 20 results each
+        self.page = 1
+        while True:
+            print(f"Scraping results from page {self.page}.")
+            # check if pagenumber is available
+            try:
+                self.get_pagelinks()
+                self.get_pagedata()
+                self.write_pagedata()
+            # catch urllib error after last page has been reached
+            except IOError:
+                print(f"Number of scraped pages today: {self.page}")
+                break
+            self.page += 1
 
     def get_pagelinks(self):
+        # scrape links to exposes from every individual result page
         self.links = []
         # use urllib.request and Beautiful soup to extract links
         soup = bs.BeautifulSoup(
