@@ -1,27 +1,26 @@
 from pathlib import Path
+import argparse
+from datetime import date
+from datetime import datetime
+
 import bs4 as bs
 import urllib.request
 from urllib.error import URLError, HTTPError
-from datetime import date
-from datetime import datetime
 import pandas as pd
 import json
 
 
 class Immo24scrape:
-    def __init__(
-        self, filename="rawdata" + str(date.today()) + ".csv", savepath="../data/",
-    ):
-        self.filename = filename
-        self.savepath = (Path(__file__).parent / savepath).resolve()
-        self.filepath = savepath + filename
+    def __init__(self):
+        pass
 
-    def scrape_data(self):
+    def main(self):
+        self.parse()
         # iterate over all available result pages showing 20 results each
-        self.page = 122
+        self.page = 1
         while True:
             print(f"Scraping results from page {self.page}.")
-            # check if pagenumber is available
+            # check if pagenumber exists
             try:
                 self.get_pagelinks()
                 self.get_pagedata()
@@ -32,13 +31,32 @@ class Immo24scrape:
                 break
             self.page += 1
 
+    def parse(self):
+        parser = argparse.ArgumentParser()
+        parser.add_argument(
+            "--type",
+            choices=["mieten", "kaufen"],
+            help="chose 'mieten' or 'kaufen'",
+            type=str,
+            default="mieten",
+        )
+        self.args = parser.parse_args()
+
+    def set_filepath(self):
+        self.filename = self.args.type + str(date.today()) + ".csv"
+        # get absolute path to script directory and select data folder in parent directory
+        self.savepath = str((Path(__file__).parent.absolute() / "../data/").resolve())
+        self.filepath = self.savepath + "/" + self.filename
+
     def get_pagelinks(self):
         # scrape links to exposes from every individual result page
         self.links = []
         # use urllib.request and Beautiful soup to extract links
         soup = bs.BeautifulSoup(
             urllib.request.urlopen(
-                "https://www.immobilienscout24.de/Suche/de/wohnung-kaufen?pagenumber="
+                "https://www.immobilienscout24.de/Suche/de/wohnung-"
+                + self.args.typ
+                + "?pagenumber="
                 + str(self.page)
             ).read(),
             "lxml",
@@ -55,7 +73,6 @@ class Immo24scrape:
         self.pagedata = pd.DataFrame()
         # get data from every expose link
         for link in self.links:
-            print(link)
             # use urllib.request and Beautiful soup to extract data
             soup = bs.BeautifulSoup(
                 urllib.request.urlopen(
@@ -91,4 +108,4 @@ class Immo24scrape:
 
 if __name__ == "__main__":
     dataset = Immo24scrape()
-    dataset.scrape_data()
+    dataset.main()
