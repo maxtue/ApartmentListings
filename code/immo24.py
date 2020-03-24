@@ -16,8 +16,13 @@ class Immo24scrape:
 
     def main(self):
         self.parse()
+        self.set_filepath()
+        self.run()
+
+    def run(self):
         # iterate over all available result pages showing 20 results each
         self.page = 1
+        self.broken_pages = []
         while True:
             print(f"Scraping results from page {self.page}.")
             # check if pagenumber exists
@@ -25,10 +30,13 @@ class Immo24scrape:
                 self.get_pagelinks()
                 self.get_pagedata()
                 self.write_pagedata()
-            # catch urllib error after last page has been reached
+            # catch urllib errors
             except (URLError, HTTPError):
-                print(f"Number of scraped pages today: {self.page}")
-                break
+                # Skip broken pages until there have been 5, then break
+                print(f"Skipping page {self.page}.")
+                self.broken_pages.append(self.page)
+                if len(self.broken_pages) > 5:
+                    break
             self.page += 1
 
     def parse(self):
@@ -36,7 +44,7 @@ class Immo24scrape:
         parser.add_argument(
             "--type",
             choices=["mieten", "kaufen"],
-            help="chose 'mieten' or 'kaufen'",
+            help="chose between 'mieten' and 'kaufen'",
             type=str,
             default="mieten",
         )
@@ -51,11 +59,11 @@ class Immo24scrape:
     def get_pagelinks(self):
         # scrape links to exposes from every individual result page
         self.links = []
-        # use urllib.request and Beautiful soup to extract links
+        # use urllib.request and beautiful soup to extract links
         soup = bs.BeautifulSoup(
             urllib.request.urlopen(
                 "https://www.immobilienscout24.de/Suche/de/wohnung-"
-                + self.args.typ
+                + self.args.type
                 + "?pagenumber="
                 + str(self.page)
             ).read(),
