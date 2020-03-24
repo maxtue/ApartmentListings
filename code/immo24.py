@@ -1,3 +1,4 @@
+from pathlib import Path
 import bs4 as bs
 import urllib.request
 from urllib.error import URLError, HTTPError
@@ -12,12 +13,12 @@ class Immo24scrape:
         self, filename="rawdata" + str(date.today()) + ".csv", savepath="../data/",
     ):
         self.filename = filename
-        self.savepath = savepath
+        self.savepath = (Path(__file__).parent / savepath).resolve()
         self.filepath = savepath + filename
 
     def scrape_data(self):
         # iterate over all available result pages showing 20 results each
-        self.page = 1
+        self.page = 122
         while True:
             print(f"Scraping results from page {self.page}.")
             # check if pagenumber is available
@@ -54,6 +55,7 @@ class Immo24scrape:
         self.pagedata = pd.DataFrame()
         # get data from every expose link
         for link in self.links:
+            print(link)
             # use urllib.request and Beautiful soup to extract data
             soup = bs.BeautifulSoup(
                 urllib.request.urlopen(
@@ -61,7 +63,7 @@ class Immo24scrape:
                 ).read(),
                 "lxml",
             )
-            # extract features
+            # extract features into Pandas Dataframe with json loader
             linkdata = pd.DataFrame(
                 json.loads(
                     str(soup.find_all("script")).split("keyValues = ")[1].split("}")[0]
