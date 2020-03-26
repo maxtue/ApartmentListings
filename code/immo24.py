@@ -3,8 +3,8 @@ import argparse
 from datetime import date
 from datetime import datetime
 
-import bs4 as bs
-import request
+from bs4 import BeautifulSoup
+import requests
 import pandas as pd
 import json
 
@@ -22,7 +22,8 @@ class Immo24scrape:
         # iterate over all available result pages showing 20 results each
         self.page = 1
         self.broken_pages = []
-        while True:
+        self.keep_running = True
+        while self.keep_running:
             print(f"Scraping results from page {self.page}.")
             # check if pagenumber exists
             try:
@@ -30,13 +31,16 @@ class Immo24scrape:
                 self.get_pagedata()
                 self.write_pagedata()
             # catch urllib errors
-            except (URLError, HTTPError):
-                # Skip broken pages until there have been 5, then break
-                print(f"Skipping page {self.page}.")
-                self.broken_pages.append(self.page)
-                if len(self.broken_pages) > 5:
-                    break
+            except:
+                self.skip_page()
             self.page += 1
+
+    def skip_page(self):
+        # Skip broken pages until there have been 5, then stop running
+        print(f"Skipping page {self.page}.")
+        self.broken_pages.append(self.page)
+        if len(self.broken_pages) > 5:
+            self.keep_running = False
 
     def parse(self):
         parser = argparse.ArgumentParser()
@@ -58,18 +62,16 @@ class Immo24scrape:
     def get_pagelinks(self):
         # scrape links to exposes from every individual result page
         self.links = []
-        # use urllib.request and beautiful soup to extract links
-        soup = bs.BeautifulSoup(
-            urllib.request.urlopen(
-                "https://www.immobilienscout24.de/Suche/de/wohnung-"
-                + self.args.type
-                + "?pagenumber="
-                + str(self.page)
-            ).read(),
-            "lxml",
-        )
-        # find all paragraphs in html-page
-        for paragraph in soup.find_all("a"):
+        # get html page
+        links_source = requests.get(
+            "https://www.immobilienscout24.de/Suche/de/wohnung-"
+            + self.args.type
+            + "?pagenumber="
+            + str(self.page)
+        ).text
+        # create soup object for parsing
+        links_soup = BeautifulSoup(links_source, "lxml")
+        for paragraph in links_soup.find_all("a"):
             # get expose numbers
             if r"/expose/" in str(paragraph.get("href")):
                 self.links.append(paragraph.get("href").split("#")[0])
@@ -78,30 +80,27 @@ class Immo24scrape:
 
     def get_pagedata(self):
         self.pagedata = pd.DataFrame()
-        # get data from every expose link
         for link in self.links:
-            # use urllib.request and Beautiful soup to extract data
-            soup = bs.BeautifulSoup(
-                urllib.request.urlopen(
-                    "https://www.immobilienscout24.de" + link
-                ).read(),
-                "lxml",
+            # get html page
+            pagedata_source = requests.get(link).text
+            # parse html page into soup object`
+            pagedata_soup = BeautifulSoup(pagedata_source, "lxml")
+            # get data which is stored in json format within the html page
+            pagedata_json = json.loads(
+                str(pagedata_soup.find_all("script"))
+                .split("keyValues = ")[1]
+                .split("}")[0]
+                + str("}")
             )
-            # extract features into Pandas Dataframe with json loader
-            linkdata = pd.DataFrame(
-                json.loads(
-                    str(soup.find_all("script")).split("keyValues = ")[1].split("}")[0]
-                    + str("}")
-                ),
-                index=[str(datetime.now())],
-            )
+            # put data into Pandas Dataframe
+            pagedata_pandas = pd.DataFrame(pagedata_json, index=[str(datetime.now())])
             # save URL as unique identifier
-            linkdata["URL"] = str(link)
-            self.pagedata = self.pagedata.append(linkdata)
+            pagedata_pandas["URL"] = str(link)
+            self.pagedata = self.pagedata.append(pagedata_pandas)
 
     def write_pagedata(self):
-        print(f"Appending data of page {self.page} to {self.filepath}")
-        with open(self.filepath, "a") as f:
+        print(f"Writing data to {self.filepath}")
+        with open(self.filepath, "w") as f:
             self.pagedata.to_csv(
                 f,
                 # only create header if file is newly created
