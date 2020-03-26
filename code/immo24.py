@@ -27,11 +27,11 @@ class Immo24scrape:
             print(f"Scraping results from page {self.page}.")
             # check if pagenumber exists
             try:
-                self.get_pagelinks()
+                self.get_links()
                 self.get_pagedata()
                 self.write_pagedata()
             # catch urllib errors
-            except:
+            except False:
                 self.skip_page()
             self.page += 1
 
@@ -59,7 +59,7 @@ class Immo24scrape:
         self.savepath = str((Path(__file__).parent.absolute() / "../data/").resolve())
         self.filepath = self.savepath + "/" + self.filename
 
-    def get_pagelinks(self):
+    def get_links(self):
         # scrape links to exposes from every individual result page
         self.links = []
         # get html page
@@ -85,22 +85,23 @@ class Immo24scrape:
             pagedata_source = requests.get(link).text
             # parse html page into soup object`
             pagedata_soup = BeautifulSoup(pagedata_source, "lxml")
-            # get data which is stored in json format within the html page
-            pagedata_json = json.loads(
-                str(pagedata_soup.find_all("script"))
-                .split("keyValues = ")[1]
-                .split("}")[0]
-                + str("}")
-            )
+            # find html element in which data is stored
+            pagedata_element = pagedata_soup.head.find("script", type="text/javascript")
+            # extract data which is stored in json style
+            pagedata_json = pagedata_element.text.split("keyValues = ")[1].split("}")[
+                0
+            ] + str("}")
+            # convert json style data to python dictionary
+            pagedata_dictionary = json.loads(pagedata_json)
             # put data into Pandas Dataframe
-            pagedata_pandas = pd.DataFrame(pagedata_json, index=[str(datetime.now())])
-            # save URL as unique identifier
-            pagedata_pandas["URL"] = str(link)
+            pagedata_pandas = pd.DataFrame(
+                pagedata_dictionary, index=[str(datetime.now())]
+            )
             self.pagedata = self.pagedata.append(pagedata_pandas)
 
     def write_pagedata(self):
         print(f"Writing data to {self.filepath}")
-        with open(self.filepath, "w") as f:
+        with open(self.filepath, "a") as f:
             self.pagedata.to_csv(
                 f,
                 # only create header if file is newly created
