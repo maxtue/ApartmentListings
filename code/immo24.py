@@ -4,8 +4,7 @@ from datetime import date
 from datetime import datetime
 
 import bs4 as bs
-import urllib.request
-from urllib.error import URLError, HTTPError
+import request
 import pandas as pd
 import json
 
@@ -74,7 +73,7 @@ class Immo24scrape:
             # get expose numbers
             if r"/expose/" in str(paragraph.get("href")):
                 self.links.append(paragraph.get("href").split("#")[0])
-            # use set function to remove duplicates (?)
+            # use set function to only keep one link per expose
             self.links = list(set(self.links))
 
     def get_pagedata(self):
