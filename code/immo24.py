@@ -1,4 +1,5 @@
 from pathlib import Path
+import traceback
 import argparse
 from datetime import date
 from datetime import datetime
@@ -20,35 +21,44 @@ class Immo24scrape:
         self.write_data()
 
     def set_vars(self):
+        self.email_adress = "email"
         self.set_filepath()
         self.data = pd.DataFrame()
+        self.broken_links_continuous = []
+        self.exit = True
         self.page = 1
-        self.broken_pages = []
-        self.keep_running = True
 
     def get_data(self):
-        while self.keep_running:
+        while True:
             print(f"Scraping results from page {self.page}.")
             try:
                 self.get_links()
                 self.get_pagedata()
-            # catch html errors
-            except requests.exceptions.RequestException as requests_error:
-                print(str(requests_error))
-                self.skip_page()
-            # send e-mail for all other errors
-            except Exception as e:
-                print(str(e))
-                self.write_data()
-                raise SystemExit
+                # reset counter list of broken links in a row
+                self.broken_links_continuous = 0
+            except Exception:
+                self.handle_error()
             self.page += 1
 
-    def skip_page(self):
-        # Skip broken pages until there have been 5, then stop running
-        print(f"Skipping page {self.page}.")
-        self.broken_pages.append(self.page)
-        if len(self.broken_pages) > 5:
-            self.keep_running = False
+    def email_on_error(self):
+        # send e-mail to self.email_adress
+        pass
+
+    def smooth_exit(self):
+        self.write_data()
+        self.email_on_error()
+        raise SystemExit
+
+    def handle_error(self):
+        self.skip_link()
+        if self.broken_links_continuous > 3:
+            self.smooth_exit()
+
+    def skip_link(self):
+        # Skip broken links until there have been too many in a row
+        print("Error in link " + self.link + ":\n")
+        traceback.print_exc()
+        self.broken_links_continuous += 1
 
     def parse(self):
         parser = argparse.ArgumentParser()
@@ -92,6 +102,8 @@ class Immo24scrape:
 
     def get_pagedata(self):
         for link in self.links:
+            # save link for error handling
+            self.link = link
             # get html page
             pagedata_source = requests.get(link).text
             # parse html page into soup object
