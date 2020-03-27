@@ -15,24 +15,32 @@ class Immo24scrape:
 
     def main(self):
         self.parse()
-        self.set_filepath()
-        self.run()
+        self.set_vars()
+        self.get_data()
+        self.write_data()
 
-    def run(self):
-        # iterate over all available result pages showing 20 results each
+    def set_vars(self):
+        self.set_filepath()
+        self.data = pd.DataFrame()
         self.page = 1
         self.broken_pages = []
         self.keep_running = True
+
+    def get_data(self):
         while self.keep_running:
             print(f"Scraping results from page {self.page}.")
-            # check if pagenumber exists
             try:
                 self.get_links()
                 self.get_pagedata()
-                self.write_pagedata()
-            # catch urllib errors
-            except False:
+            # catch html errors
+            except requests.exceptions.RequestException as requests_error:
+                print(str(requests_error))
                 self.skip_page()
+            # send e-mail for all other errors
+            except Exception as e:
+                print(str(e))
+                self.write_data()
+                raise SystemExit
             self.page += 1
 
     def skip_page(self):
@@ -71,38 +79,39 @@ class Immo24scrape:
         ).text
         # create soup object for parsing
         links_soup = BeautifulSoup(links_source, "lxml")
-        for paragraph in links_soup.find_all("a"):
-            # get expose numbers
-            if r"/expose/" in str(paragraph.get("href")):
-                self.links.append(paragraph.get("href").split("#")[0])
-            # use set function to only keep one link per expose
+        # search through all hyperlink <a> containers
+        for link_container in links_soup.find_all("a"):
+            # check for expose links
+            if r"/expose/" in str(link_container.get("href")):
+                # cocatenate with homepage to get full link and append
+                self.links.append(
+                    "https://www.immobilienscout24.de" + link_container.get("href")
+                )
+            # use set function to remove duplicates
             self.links = list(set(self.links))
 
     def get_pagedata(self):
-        self.pagedata = pd.DataFrame()
         for link in self.links:
             # get html page
             pagedata_source = requests.get(link).text
-            # parse html page into soup object`
+            # parse html page into soup object
             pagedata_soup = BeautifulSoup(pagedata_source, "lxml")
-            # find html element in which data is stored
-            pagedata_element = pagedata_soup.head.find("script", type="text/javascript")
+            # find html container in which data is stored
+            pagedata_cont = pagedata_soup.head.find("script", type="text/javascript")
             # extract data which is stored in json style
-            pagedata_json = pagedata_element.text.split("keyValues = ")[1].split("}")[
-                0
-            ] + str("}")
+            pagedata_json = pagedata_cont.text.split("keyValues = ")[1].split(";\n")[0]
             # convert json style data to python dictionary
             pagedata_dictionary = json.loads(pagedata_json)
             # put data into Pandas Dataframe
             pagedata_pandas = pd.DataFrame(
                 pagedata_dictionary, index=[str(datetime.now())]
             )
-            self.pagedata = self.pagedata.append(pagedata_pandas)
+            self.data = self.data.append(pagedata_pandas)
 
-    def write_pagedata(self):
+    def write_data(self):
         print(f"Writing data to {self.filepath}")
-        with open(self.filepath, "a") as f:
-            self.pagedata.to_csv(
+        with open(self.filepath, "w") as f:
+            self.data.to_csv(
                 f,
                 # only create header if file is newly created
                 header=f.tell() == 0,
