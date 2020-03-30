@@ -38,6 +38,8 @@ class Immo24scrape:
         self.filename = self.args.type + str(date.today()) + ".csv"
         # get absolute path to script directory and select data folder in parent directory
         self.savepath = str((Path(__file__).parent.absolute() / "../data/").resolve())
+        # create directory if it does not exist
+        Path(self.savepath).mkdir(parents=True, exist_ok=True)
         self.filepath = self.savepath + "/" + self.filename
 
     """ Main methods """
