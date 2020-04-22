@@ -16,6 +16,7 @@ requests = "*"
 nb-black = "*"
 jupyter = "*"
 jupyter-contrib-nbextensions = "*"
+jsonschema = "*"
 
 [requires]
 python_version = "*"
