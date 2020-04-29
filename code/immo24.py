@@ -36,9 +36,7 @@ class Immo24scrape:
 
     def set_filepath(self):
         self.filename = self.args.type + str(date.today()) + ".csv"
-        # get absolute path to script directory and select data folder in parent directory
         self.savepath = str((Path(__file__).parent.absolute() / "../data/").resolve())
-        # create directory if it does not exist
         Path(self.savepath).mkdir(parents=True, exist_ok=True)
         self.filepath = self.savepath + "/" + self.filename
 
@@ -55,75 +53,71 @@ class Immo24scrape:
             self.get_links()
             self.get_linkdata()
             self.page += 1
+            if self.page == 2:
+                self.smooth_exit()
 
     def get_links(self):
-        # scrape links to exposes from every individual result page
         self.links = []
-        # get html page
         self.links_source = requests.get(
             "https://www.immobilienscout24.de/Suche/de/wohnung-"
             + self.args.type
             + "?pagenumber="
             + str(self.page)
         ).text
-        self.parse_links_source()
+        self.parse_links_exposes()
 
-    def parse_links_source(self):
-        # create soup object for parsing
+    def parse_links_exposes(self):
         links_soup = BeautifulSoup(self.links_source, "lxml")
-        # search through all hyperlink <a> containers
         for link_container in links_soup.find_all("a"):
-            # check for expose links
             if r"/expose/" in str(link_container.get("href")):
-                # cocatenate with homepage to get full link and append
                 self.links.append(
                     "https://www.immobilienscout24.de" + link_container.get("href")
                 )
-            # use set function to remove duplicates
-            self.links = list(set(self.links))
-        # exit if no expose links where found
         if not self.links:
-            print("No links found on page " + str(self.page))
+            print("No exposes found on page " + str(self.page))
             self.smooth_exit()
 
     def get_linkdata(self):
         for link in self.links:
+            self.link = link
             try:
-                # save link for error handling
-                self.link = link
-                # get html page
-                pagedata_source = requests.get(link).text
-                # parse html page into soup object
-                pagedata_soup = BeautifulSoup(pagedata_source, "lxml")
-                # find html container in which data is stored
-                pagedata_cont = pagedata_soup.head.find(
-                    "script", type="text/javascript"
-                )
-                # extract data which is stored in json style
-                pagedata_json = pagedata_cont.text.split("keyValues = ")[1].split(
-                    ";\n"
-                )[0]
-                # convert json style data to python dictionary
-                pagedata_dictionary = json.loads(pagedata_json)
-                # put data into Pandas Dataframe
-                pagedata_pandas = pd.DataFrame(
-                    pagedata_dictionary, index=[str(datetime.now())]
-                )
-                self.data = self.data.append(pagedata_pandas)
+                self.get_linkvalues()
+                self.get_linktexts()
+                self.data = self.data.append(self.pagedata_pandas)
             except Exception:
                 self.skip_link()
+
+    def get_linkvalues(self):
+        self.pagedata_source = requests.get(self.link).text
+        self.pagedata_soup = BeautifulSoup(self.pagedata_source, "lxml")
+        self.pagedata_values = self.pagedata_soup.head.find(
+            "script", type="text/javascript"
+        )
+        self.pagedata_json = (
+            str(self.pagedata_values).split("keyValues = ")[1].split(";\n")[0]
+        )
+
+        self.pagedata_dictionary = json.loads(self.pagedata_json)
+        self.pagedata_pandas = pd.DataFrame(
+            self.pagedata_dictionary, index=[str(datetime.now())]
+        )
+
+    def get_linktexts(self):
+        for feature in ["objektbeschreibung", "ausstattung", "lage"]:
+            try:
+                print(self.pagedata_soup.head.find_all("pre"))
+                self.linktext = self.pagedata_soup.head.find(
+                    "pre", class_=f"is24qa-{feature}"
+                )
+                self.pagedata_pandas[f"text_{feature}"] = str(self.linktext)
+            except:
+                pass
 
     def write_data(self):
         print(f"Writing data to {self.filepath}")
         with open(self.filepath, "w") as f:
             self.data.to_csv(
-                f,
-                # only create header if file is newly created
-                header=f.tell() == 0,
-                sep=";",
-                decimal=",",
-                encoding="utf-8",
-                index_label="timestamp",
+                f, sep=";", decimal=",", encoding="utf-8", index_label="timestamp",
             )
 
     """ Error handling methods """
@@ -137,6 +131,7 @@ class Immo24scrape:
             self.smooth_exit()
 
     def smooth_exit(self):
+        self.data = self.data.drop_duplicates(subset="obj_scoutId")
         self.write_data()
         raise SystemExit
 
