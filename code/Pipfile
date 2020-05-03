@@ -17,6 +17,7 @@ nb-black = "*"
 jupyter = "*"
 jupyter-contrib-nbextensions = "*"
 jsonschema = "*"
+sklearn = "*"
 
 [requires]
 python_version = "*"
