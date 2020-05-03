@@ -5,15 +5,11 @@ Scrape and analyse Apartment listings for rent and sale from Germanys most popul
 ## Motivation
 Sure, they offer some tools and data to analyse within their premium membership. But how much more fun would it be to have all the data yourself?
 
- 
-## Screenshots
-Include logo/demo screenshot etc.
-
-
-
 ## Features
 What makes your project stand out?
 
+![](rent_timeseries_plot.png)
+![](rent_listings_table.png)
 
 ## Installation
 Provide step by step series of examples and explanations about how to get a development env running.
