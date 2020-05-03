@@ -8,8 +8,8 @@ Sure, they offer some tools and data to analyse within their premium membership.
 ## Features
 What makes your project stand out?
 
-![]("rent_timeseries_plot.png")
-<img src="rent_listings_table.png" width="425"/> 
+![](rent_timeseries_plot.png)
+![](rent_listings_table.png)
 
 ## Installation
 Provide step by step series of examples and explanations about how to get a development env running.
