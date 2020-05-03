@@ -3,7 +3,7 @@ Scrape and analyse Apartment listings for rent and sale from Germanys most popul
 
 
 ## Motivation
-Sure, they offer some tools and data to analyse within their premium membership. But how much more fun would it be to collect all the data yourself?
+Sure, they offer some tools and data to analyse within their premium membership. But how much more fun would it be to have all the data yourself?
 
  
 ## Screenshots
