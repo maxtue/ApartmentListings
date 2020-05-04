@@ -6,13 +6,23 @@ Scrape and analyse Apartment listings for rent and sale from Germanys most popul
 Sure, they offer some tools and data to analyse within their premium membership. But how much more fun would it be to have all the data yourself?
 
 ## Features
-What makes your project stand out?
+- visualize median rents and number of listings in a zip code or district
 
 ![](rent_timeseries_plot.png)
+
+- check all current listings in a zip code or district ordered by rent per square meter  
+
 ![](rent_listings_table.png)
 
+- compare median sale prices with median rent prices in all zip codes or districts
+
+
+
 ## Installation
-Provide step by step series of examples and explanations about how to get a development env running.
+After cloning the repository you can easily use Pipenv to set up a virtual environment like so:
+sh'''
+dfds
+'''
 
 
 
