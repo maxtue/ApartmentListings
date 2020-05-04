@@ -25,18 +25,28 @@ cd code/
 pipenv install
 ```
 
-## How to use?
+## How to use the Scraper?
 Run scraper.py in an active Pipenv shell which will store a .csv file in a new data/ folder in the main repository directory after running:
 ```
 cd code/
 pipenv shell
 python scraper.py
 ```
-Type
+Use the --type option to get rent listings (mieten) or sale listings (kaufen)
 ```
-python scraper.py --help
+python scraper.py --type mieten
+python scraper.py --type kaufen
 ```
-for additional command line arguments  
+
+## How to do the data analysis?
+There are two jupyter notebooks in the data_analysis/ folder available. They can be opened in a browser by 
+```
+cd code/
+pipenv shell
+cd ../data_analysis
+jupyter notebook
+```
+Both notebooks will access data from the data/ folder created by the scraper. They are predesigned to clean the data and show some interesting results but need at least one file each for rent and sale listings from a same day. 
 
 ## Main python packages used
  - Webscraper: BeautifulSoup4 and Requests
