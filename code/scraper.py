@@ -10,12 +10,9 @@ import pandas as pd
 import json
 
 
-class Immo24scrape:
+class Immo24:
 
     """ Initialization methods """
-
-    def __init__(self):
-        pass
 
     def parse(self):
         parser = argparse.ArgumentParser()
@@ -82,7 +79,6 @@ class Immo24scrape:
             self.link = link
             try:
                 self.get_linkvalues()
-                self.get_linktexts()
                 self.data = self.data.append(self.pagedata_pandas)
             except Exception:
                 self.skip_link()
@@ -101,17 +97,6 @@ class Immo24scrape:
         self.pagedata_pandas = pd.DataFrame(
             self.pagedata_dictionary, index=[str(datetime.now())]
         )
-
-    def get_linktexts(self):
-        for feature in ["objektbeschreibung", "ausstattung", "lage"]:
-            try:
-                print(self.pagedata_soup.head.find_all("pre"))
-                self.linktext = self.pagedata_soup.head.find(
-                    "pre", class_=f"is24qa-{feature}"
-                )
-                self.pagedata_pandas[f"text_{feature}"] = str(self.linktext)
-            except:
-                pass
 
     def write_data(self):
         print(f"Writing data to {self.filepath}")
@@ -137,5 +122,5 @@ class Immo24scrape:
 
 
 if __name__ == "__main__":
-    dataset = Immo24scrape()
+    dataset = Immo24()
     dataset.main()
