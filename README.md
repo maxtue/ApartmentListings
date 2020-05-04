@@ -1,5 +1,5 @@
 # ApartmentListings
-Scrape and analyse Apartment listings for rent and sale from Germanys most popular housing website [Immobilienscout24.de](https://www.immobilienscout24.de/) with Python.
+Scrape and analyse apartment listings for rent and sale from Germanys most popular housing website [Immobilienscout24.de](https://www.immobilienscout24.de/) with Python.
 
 
 ## Motivation
