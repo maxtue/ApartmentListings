@@ -19,14 +19,24 @@ Compare median sale prices with median rent prices in all zip codes or districts
 
 
 ## Installation
-After cloning the repository you can easily use Pipenv to set up a virtual environment wih all packages installed:
+After cloning the repository you can easily use Pipenv to set up a virtual environment. It will read from Pipfile and Pipfile.lock in code/ to install all necessary packages:
 ```
 cd code/
 pipenv install
 ```
 
 ## How to use?
-If people like your project they’ll want to learn how they can use it. To do so include step by step guide to use your project.
+Run scraper.py in an active Pipenv shell which will store a .csv file in a new data/ folder in the main repository directory after running:
+```
+cd code/
+pipenv shell
+python scraper.py
+```
+Type
+```
+python scraper.py --help
+```
+for additional command line arguments  
 
 ## Main python packages used
  - Webscraper: BeautifulSoup4 and Requests
