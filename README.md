@@ -1,16 +1,16 @@
 # ApartmentListings
-Scrape and analyse Apartment listings for rent and sale from Germanys most popular housing website [Immobilienscout24.de](https://www.immobilienscout24.de/) with Python.
+Scrape and analyse apartment listings for rent and sale from Germanys most popular housing website [Immobilienscout24.de](https://www.immobilienscout24.de/) with Python.
 
 
 ## Motivation
 Sure, they offer some tools and data to analyse within their premium membership. But how much more fun would it be to have all the data yourself?
 
 ## Features
-Visualize median rents and number of listings in a zip code or district
+Visualize median rents and number of listings in a zip code or district:  
 
 ![](rent_timeseries_plot.png)
 
-Check all current listings in a zip code or district ordered by rent per square meter  
+Check all current listings in a zip code or district ordered by rent per square meter:  
 
 ![](rent_listings_table.png)
 
@@ -39,14 +39,14 @@ python scraper.py --type kaufen
 ```
 
 ## How to do the data analysis?
-There are two jupyter notebooks in the data_analysis/ folder available. They can be opened in a browser by 
+There are two predesigned jupyter notebooks in the data_analysis/ folder available. They can be opened in a browser by 
 ```
 cd code/
 pipenv shell
 cd ../data_analysis
 jupyter notebook
 ```
-Both notebooks will access data from the data/ folder created by the scraper. They are predesigned to clean the data and show some interesting results but need at least one file each for rent and sale listings from a same day. 
+Both notebooks will access data from the data/ folder created by the scraper. They clean the data and show some interesting results. At least one .csv file each with rent and sale listings is needed.
 
 ## Main python packages used
  - Webscraper: BeautifulSoup4 and Requests
