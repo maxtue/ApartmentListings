@@ -1,6 +1,9 @@
 # ApartmentListings
 Scrape and analyse apartment listings for rent and sale from Germanys most popular housing website [Immobilienscout24.de](https://www.immobilienscout24.de/) with Python.
 
+## Motivation
+Get the data without the need to register with their API.
+
 ## Features
 Visualize median rents and number of listings in a zip code or district:  
 
