@@ -37,8 +37,6 @@ class Immo24:
         Path(self.savepath).mkdir(parents=True, exist_ok=True)
         self.filepath = self.savepath + "/" + self.filename
 
-    """ Main methods """
-
     def main(self):
         self.parse()
         self.set_vars()
@@ -104,8 +102,6 @@ class Immo24:
             self.data.to_csv(
                 f, sep=";", decimal=",", encoding="utf-8", index_label="timestamp",
             )
-
-    """ Error handling methods """
 
     def skip_link(self):
         print("Error in link " + self.link + ":\n")
