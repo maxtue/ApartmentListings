@@ -2,7 +2,7 @@
 Scrape and analyse apartment listings for rent and sale from Germanys most popular housing website [Immobilienscout24.de](https://www.immobilienscout24.de/) with Python.
 
 ## Motivation
-Get the Apartment listings for all of Germany without the need to register with the websites API. The scraper will go through every individual listing expose, exctract the most important parameters and store them in a .csv file.
+Get the Apartment listings for all of Germany. The scraper will go through every individual listing expose, exctract the most important parameters and store them in a .csv file.
 
 ## Features
 Visualize median rents and number of listings in a zip code or district over time:
@@ -11,7 +11,7 @@ Visualize median rents and number of listings in a zip code or district over tim
 
 Visualize median saleprices and number of listings in a zip code or district over time:
 
-![](data_analysis/rent_timeseries_plot.png)
+![](data_analysis/sale_timeseries_plot.png)
 
 ## Installation
 After cloning the repository you can easily use Pipenv to set up a virtual environment. It will read from Pipfile and Pipfile.lock in code/ to install all necessary packages:
