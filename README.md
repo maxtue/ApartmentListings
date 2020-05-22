@@ -5,17 +5,9 @@ Scrape and analyse apartment listings for rent and sale from Germanys most popul
 Get the Apartment listings for all of Germany without the need to register with the websites API. The scraper will go through every individual listing expose, exctract the most important parameters and store them in a .csv file.
 
 ## Features
-Visualize median rents and number of listings in a zip code or district:  
+Visualize median rents and number of listings in a zip code or district over time:
 
-![](rent_timeseries_plot.png)
-
-Check all current listings in a zip code or district ordered by rent per square meter:  
-
-![](rent_listings_table.png)
-
-Compare median sale prices with median rent prices in all zip codes or districts
-
-
+![](data_analysis/rent_timeseries_plot.pdf)
 
 ## Installation
 After cloning the repository you can easily use Pipenv to set up a virtual environment. It will read from Pipfile and Pipfile.lock in code/ to install all necessary packages:
@@ -38,7 +30,7 @@ python scraper.py --type kaufen
 ```
 
 ## How to do the data analysis?
-There are two predesigned jupyter notebooks in the data_analysis/ folder available. They can be opened in a browser by 
+There are two predesigned jupyter notebooks in the data_analysis/ folder available. They can be opened in a browser by
 ```
 cd code/
 pipenv shell
