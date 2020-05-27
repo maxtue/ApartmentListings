@@ -21,7 +21,7 @@ pipenv install
 ```
 
 ## How to use the Scraper?
-Run scraper.py in an active Pipenv shell which will store a .csv file in a new data/ folder in the main repository directory after running:
+Run scraper.py in an active Pipenv shell. It will save a .csv file in a new data/ folder in the main repository directory after running:
 ```
 pipenv shell
 cd code/
