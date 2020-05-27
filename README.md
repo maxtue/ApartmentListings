@@ -14,17 +14,17 @@ Visualize median saleprices and number of listings in a zip code or district ove
 ![](data_analysis/sale_timeseries_plot.png)
 
 ## Installation
-After cloning the repository you can easily use Pipenv to set up a virtual environment. It will read from Pipfile and Pipfile.lock in code/ to install all necessary packages:
+After cloning the repository you can easily use Pipenv to set up a virtual environment. It will read from Pipfile and Pipfile.lock in the main repository to install all necessary packages:
 ```
-cd code/
+cd ApartmentListings/
 pipenv install
 ```
 
 ## How to use the Scraper?
 Run scraper.py in an active Pipenv shell which will store a .csv file in a new data/ folder in the main repository directory after running:
 ```
-cd code/
 pipenv shell
+cd code/
 python scraper.py
 ```
 Use the --type option to get rent listings (mieten) or sale listings (kaufen)
@@ -36,12 +36,11 @@ python scraper.py --type kaufen
 ## How to do the data analysis?
 There are two predesigned jupyter notebooks in the data_analysis/ folder available. They can be opened in a browser by
 ```
-cd code/
 pipenv shell
-cd ../data_analysis
+cd data_analysis/
 jupyter notebook
 ```
-Both notebooks will access data from the data/ folder created by the scraper. They clean the data and show some interesting results. At least one .csv file each with rent and sale listings is needed.
+Both notebooks will access data from the data/ folder created by the scraper. They clean the data and show some interesting results. At least one pair of .csv files with rent and sale listings from the same date are needed.
 
 ## Main python packages used
  - Webscraper: BeautifulSoup4 and Requests
