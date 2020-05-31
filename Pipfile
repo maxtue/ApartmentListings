@@ -18,6 +18,8 @@ jupyter = "*"
 jupyter-contrib-nbextensions = "*"
 jsonschema = "*"
 sklearn = "*"
+numpy = "*"
+keras = "*"
 
 [requires]
 python_version = "*"
