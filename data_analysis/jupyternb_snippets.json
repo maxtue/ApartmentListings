@@ -1,0 +1,24 @@
+{
+    "name": "My favorites",
+    "sub-menu": [
+        {
+            "name": "Datascience Imports",
+            "snippet": [
+                "import numpy as np",
+                "from matplotlib import pyplot as plt",
+                "import pandas as pd",
+                "%load_ext nb_black",
+                "%matplotlib inline",
+                "plt.rcParams['figure.dpi'] = 150",
+                "pd.set_option('display.precision', 2)",
+                "pd.set_option('display.max_columns', None)"
+            ]
+        },
+        {
+            "name": "TeX can be written in menu labels $\\alpha_W e\\int_0 \\mu \\epsilon$",
+            "snippet": [
+                "another_new_command(2.78)"
+            ]
+        }
+    ]
+}

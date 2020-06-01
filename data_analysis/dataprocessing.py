@@ -64,15 +64,15 @@ def plot_1feature(df, attr, dates, feature1):
     y1 = [df.loc[attr][f"{feature1} {date}"] for date in x]
     color1 = "orange"
 
-    fig, ax1 = plt.subplots()
+    fig, ax = plt.subplots()
     fig.suptitle(f"{feature1} in {attr}")
 
-    ax1.set_xlabel("date")
-    ax1.set_ylabel(feature1, color=color1)
-    ax1.plot(x, y1, color=color1, label=feature1)
-    ax1.set_xticklabels(x, rotation=90)
+    ax.set_xlabel("date")
+    ax.set_ylabel(feature1, color=color1)
+    ax.plot(x, y1, color=color1, label=feature1)
+    ax.set_xticklabels(x, rotation=90)
 
-    ax1.legend()
+    ax.legend()
     plt.show()
 
 

@@ -10,7 +10,7 @@ import pandas as pd
 import json
 
 
-class Immo24:
+class Scraper:
 
     """ Initialization methods """
 
@@ -118,5 +118,5 @@ class Immo24:
 
 
 if __name__ == "__main__":
-    dataset = Immo24()
+    dataset = Scraper()
     dataset.main()
