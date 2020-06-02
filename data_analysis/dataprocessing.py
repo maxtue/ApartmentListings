@@ -8,7 +8,6 @@ def load_df(filepath):
         x.replace("obj_", "").replace("ga_", "").replace("geo_", "") for x in df.columns
     ]
     df = df.drop_duplicates(subset="scoutId")
-    df = df[df.columns[~df.isnull().any()]]
     return df
 
 
