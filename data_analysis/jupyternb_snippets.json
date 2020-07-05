@@ -7,11 +7,21 @@
                 "import numpy as np",
                 "from matplotlib import pyplot as plt",
                 "import pandas as pd",
+                "from timeit import default_timer as timer",
                 "%load_ext nb_black",
                 "%matplotlib inline",
                 "plt.rcParams['figure.dpi'] = 150",
                 "pd.set_option('display.precision', 2)",
                 "pd.set_option('display.max_columns', None)"
+            ]
+        },
+        {
+            "name": "Remove nans and infs",
+            "snippet": [
+                "allowed_nan_percentage_cols = 0.1",
+                "df.replace([np.inf, -np.inf], np.nan)",
+                "df = df.loc[:, df.isnull().sum() < allowed_nan_percentage_cols * df.shape[0]]",
+                "df = df[~df.isin([np.nan, np.inf, -np.inf]).any(1)]"
             ]
         },
         {
