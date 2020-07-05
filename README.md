@@ -15,7 +15,7 @@ Visualize median saleprices and number of listings in a zip code or district ove
 
 Gaussian outlier detection:
 
-![](data_analysis/rent_outlier.pdf)
+![](data_analysis/rent_outlier.png)
 
 ## Installation
 After cloning the repository you can easily use Pipenv to set up a virtual environment. It will read from Pipfile and Pipfile.lock in the main repository to install all necessary packages:
@@ -48,8 +48,7 @@ Both notebooks will access data from the data/ folder created by the scraper. Th
 
 ## Main python packages used
  - Webscraper: BeautifulSoup4 and Requests
- - Data analysis: Pandas and Matplotlib
- - For a full list check the Pipfile!
+ - Data analysis: numpy, pandas, matplotlib and scikit-learn!
 
 ## Tests
 to be implemented
