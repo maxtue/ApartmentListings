@@ -13,6 +13,10 @@ Visualize median saleprices and number of listings in a zip code or district ove
 
 ![](data_analysis/sale_timeseries_plot.png)
 
+Gaussian outlier detection:
+
+![](data_analysis/rent_outlier.pdf)
+
 ## Installation
 After cloning the repository you can easily use Pipenv to set up a virtual environment. It will read from Pipfile and Pipfile.lock in the main repository to install all necessary packages:
 ```
