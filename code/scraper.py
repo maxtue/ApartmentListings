@@ -12,7 +12,7 @@ import json
 
 class Scraper:
 
-    """ Initialization methods """
+    """ Setter methods """
 
     def parse(self):
         parser = argparse.ArgumentParser()
@@ -32,15 +32,12 @@ class Scraper:
         self.page = 1
 
     def set_filepath(self):
-        self.filename = self.args.type + str(date.today()) + ".csv"
-        self.savepath = str((Path(__file__).parent.absolute() / "../data/").resolve())
-        Path(self.savepath).mkdir(parents=True, exist_ok=True)
-        self.filepath = self.savepath + "/" + self.filename
+        filename = self.args.type + str(date.today()) + ".csv"
+        savepath = str((Path(__file__).parent.absolute() / "../data/").resolve())
+        Path(savepath).mkdir(parents=True, exist_ok=True)
+        self.filepath = savepath + "/" + filename
 
-    def main(self):
-        self.parse()
-        self.set_vars()
-        self.get_data()
+    """ Getter methods """
 
     def get_data(self):
         while True:
@@ -48,8 +45,6 @@ class Scraper:
             self.get_links()
             self.get_linkdata()
             self.page += 1
-            if self.page == 2:
-                self.smooth_exit()
 
     def get_links(self):
         self.links = []
@@ -77,24 +72,17 @@ class Scraper:
             self.link = link
             try:
                 self.get_linkvalues()
-                self.data = self.data.append(self.pagedata_pandas)
             except Exception:
                 self.skip_link()
 
     def get_linkvalues(self):
-        self.pagedata_source = requests.get(self.link).text
-        self.pagedata_soup = BeautifulSoup(self.pagedata_source, "lxml")
-        self.pagedata_values = self.pagedata_soup.head.find(
-            "script", type="text/javascript"
-        )
-        self.pagedata_json = (
-            str(self.pagedata_values).split("keyValues = ")[1].split(";\n")[0]
-        )
-
-        self.pagedata_dictionary = json.loads(self.pagedata_json)
-        self.pagedata_pandas = pd.DataFrame(
-            self.pagedata_dictionary, index=[str(datetime.now())]
-        )
+        pagedata_source = requests.get(self.link).text
+        pagedata_soup = BeautifulSoup(pagedata_source, "lxml")
+        pagedata_values = pagedata_soup.head.find("script", type="text/javascript")
+        pagedata_json = str(pagedata_values).split("keyValues = ")[1].split(";\n")[0]
+        pagedata_dictionary = json.loads(pagedata_json)
+        pagedata_pandas = pd.DataFrame(pagedata_dictionary, index=[str(datetime.now())])
+        self.data = self.data.append(pagedata_pandas)
 
     def write_data(self):
         print(f"Writing data to {self.filepath}")
@@ -102,6 +90,8 @@ class Scraper:
             self.data.to_csv(
                 f, sep=";", decimal=",", encoding="utf-8", index_label="timestamp",
             )
+
+    """ Error handling methods """
 
     def skip_link(self):
         print("Error in link " + self.link + ":\n")
@@ -115,6 +105,11 @@ class Scraper:
         self.data = self.data.drop_duplicates(subset="obj_scoutId")
         self.write_data()
         raise SystemExit
+
+    def main(self):
+        self.parse()
+        self.set_vars()
+        self.get_data()
 
 
 if __name__ == "__main__":
