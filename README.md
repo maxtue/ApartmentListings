@@ -1,5 +1,5 @@
 # ApartmentListings
-Scrape and analyse apartment listings for rent and sale from Germanys most popular housing website [Immobilienscout24.de](https://www.immobilienscout24.de/) with Python.
+Scrape and analyze apartment listings for rent and sale from Germanys most popular housing website [Immobilienscout24.de](https://www.immobilienscout24.de/) with Python.
 
 ## Motivation
 Get the Apartment listings for all of Germany. The scraper will go through every individual listing expose, exctract the most important parameters and store them in a .csv file.
@@ -48,7 +48,7 @@ Both notebooks will access data from the data/ folder created by the scraper. Th
 
 ## Main python packages used
  - Webscraper: BeautifulSoup4 and Requests
- - Data analysis: numpy, pandas, matplotlib and scikit-learn!
+ - Data analysis: numpy, pandas, matplotlib and scikit-learn
 
 ## Tests
 to be implemented
