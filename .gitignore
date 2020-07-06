@@ -1,5 +1,6 @@
 # Project specific
 data/
+3day_data/
 .vscode/
 .DS_Store
 test.*
