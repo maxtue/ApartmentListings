@@ -108,5 +108,5 @@ def plot_2features(df, rentsale_type, attr, dates, feature1, feature2):
     lines2, labels2 = ax2.get_legend_handles_labels()
     ax2.legend(lines1 + lines2, labels1 + labels2)
 
-    plt.savefig(f"{rentsale_type}_timeseries_plot.pdf", bbox_inches="tight")
+    plt.savefig(f"{rentsale_type}_timeseries_plot.png", bbox_inches="tight")
     plt.show()
