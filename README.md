@@ -48,7 +48,7 @@ Both notebooks will access data from the data/ folder created by the scraper. Th
 
 ## Main python packages used
  - Webscraper: BeautifulSoup4 and Requests
- - Data analysis: numpy, pandas, matplotlib and scikit-learn
+ - Data analysis: Numpy, Pandas, Matplotlib and Scikit-learn
 
 ## Tests
 to be implemented
