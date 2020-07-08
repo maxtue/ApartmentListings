@@ -49,10 +49,7 @@ class Scraper:
     def get_links(self):
         self.links = []
         self.links_source = requests.get(
-            "https://www.immobilienscout24.de/Suche/de/wohnung-"
-            + self.args.type
-            + "?pagenumber="
-            + str(self.page)
+            "https://www.immobilienscout24.de/Suche/de/wohnung-" + self.args.type + "?pagenumber=" + str(self.page)
         ).text
         self.parse_links_exposes()
 
@@ -60,9 +57,8 @@ class Scraper:
         links_soup = BeautifulSoup(self.links_source, "lxml")
         for link_container in links_soup.find_all("a"):
             if r"/expose/" in str(link_container.get("href")):
-                self.links.append(
-                    "https://www.immobilienscout24.de" + link_container.get("href")
-                )
+                self.links.append("https://www.immobilienscout24.de" + link_container.get("href"))
+        self.links = list(set(self.links))
         if not self.links:
             print("No exposes found on page " + str(self.page))
             self.smooth_exit()
