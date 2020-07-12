@@ -26,6 +26,10 @@ def create_sale_df(date):
     return sale_df
 
 
+def make_clickable(val):
+    return '<a target="_blank" href="{}">{}</a>'.format(val, val)
+
+
 def remove_nan_inf(df, allowed_nan_percentage_cols):
     df.replace([np.inf, -np.inf], np.nan)
     df = df.loc[:, df.isnull().sum() < allowed_nan_percentage_cols * df.shape[0]]
