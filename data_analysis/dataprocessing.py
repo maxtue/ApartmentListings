@@ -43,12 +43,12 @@ def create_combined_df(date):
     g = rent_df.groupby("zipCode")["rent_m2"].median()
     g.name = "rent_m2_zipCode"
     sale_df = sale_df.join(g, on="zipCode").copy()
-    sale_df["yearly_ROI"] = sale_df["rent_m2_zipCode"] * 12 / sale_df["price_m2"]
+    sale_df["yearly_roi"] = sale_df["rent_m2_zipCode"] * 12 / sale_df["price_m2"]
 
     group = "zipCode"
     combined_df = pd.concat(
         [
-            sale_df.groupby(group)["yearly_ROI"].median(),
+            sale_df.groupby(group)["yearly_roi"].median(),
             rent_df.groupby(group)["rent_m2"].median(),
             rent_df.groupby(group)["rent_m2"].size(),
             sale_df.groupby(group)["price_m2"].median(),
@@ -56,7 +56,7 @@ def create_combined_df(date):
         ],
         axis=1,
         keys=[
-            "median_yearly_ROI " + date,
+            "median_yearly_roi " + date,
             "median_rent_m2 " + date,
             "num_rent " + date,
             "median_price_m2 " + date,
@@ -67,7 +67,7 @@ def create_combined_df(date):
 
 
 def compute_change(df, df_column, startdate, enddate):
-    return df[df_column + enddate] / df[df_column + startdate]
+    return df[f"{df_column} {enddate}"] / df[f"{df_column} {startdate}"]
 
 
 def plot_1feature(df, attr, dates, feature1):
@@ -80,10 +80,10 @@ def plot_1feature(df, attr, dates, feature1):
 
     ax.set_xlabel("date")
     ax.set_ylabel(feature1, color=color1)
-    ax.plot(x, y1, color=color1, label=feature1)
+    ax.xaxis.set_major_locator(plt.MaxNLocator(7))
+    ax.plot(x, y1, color=color1)
     ax.set_xticklabels(x, rotation=90)
 
-    ax.legend()
     plt.show()
 
 
@@ -106,6 +106,7 @@ def plot_2features(df, rentsale_type, attr, dates, feature1, feature2):
     ax2 = ax1.twinx()
     ax2.set_ylabel(feature2, color=color2)
     ax2.xaxis.set_major_locator(plt.MaxNLocator(7))
+    ax2.yaxis.set_major_locator(plt.MaxNLocator(integer=True))
     ax2.plot(x, y2, linestyle="--", color=color2, label=feature2)
 
     lines1, labels1 = ax1.get_legend_handles_labels()
