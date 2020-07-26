@@ -11,10 +11,18 @@ import json
 
 
 class Scraper:
+    """ A web scraper for apartments on Immobilienscout.de """
 
-    """ Setter methods """
+    # Setter methods
 
-    def parse(self):
+    def __init__(self):
+        self.parse_argparse()
+        self.set_filepath()
+        self.data = pd.DataFrame()
+        self.broken_exposes = []
+        self.page = 1
+
+    def parse_argparse(self):
         parser = argparse.ArgumentParser()
         parser.add_argument(
             "--type",
@@ -25,60 +33,61 @@ class Scraper:
         )
         self.args = parser.parse_args()
 
-    def set_vars(self):
-        self.set_filepath()
-        self.data = pd.DataFrame()
-        self.broken_links = []
-        self.page = 1
-
     def set_filepath(self):
         filename = self.args.type + str(date.today()) + ".csv"
         savepath = str((Path(__file__).parent.absolute() / "../data/").resolve())
         Path(savepath).mkdir(parents=True, exist_ok=True)
         self.filepath = savepath + "/" + filename
 
-    """ Getter methods """
+    # Getter methods
 
-    def get_data(self):
+    def main(self):
         while True:
             print(f"Scraping results from page {self.page}.")
-            self.get_links()
-            self.get_linkdata()
+            self.get_expose_links()
+            self.get_expose_data()
             self.page += 1
 
-    def get_links(self):
-        self.links = []
-        self.links_source = requests.get(
-            "https://www.immobilienscout24.de/Suche/de/wohnung-" + self.args.type + "?pagenumber=" + str(self.page)
+    def get_expose_links(self):
+        self.exposes_page = requests.get(
+            "https://www.immobilienscout24.de/Suche/de/wohnung-"
+            + self.args.type
+            + "?pagenumber="
+            + str(self.page)
         ).text
-        self.parse_links_exposes()
+        self.parse_exposes_page()
 
-    def parse_links_exposes(self):
-        links_soup = BeautifulSoup(self.links_source, "lxml")
-        for link_container in links_soup.find_all("a"):
-            if r"/expose/" in str(link_container.get("href")):
-                self.links.append("https://www.immobilienscout24.de" + link_container.get("href"))
-        self.links = list(set(self.links))
-        if not self.links:
+    def parse_exposes_page(self):
+        self.exposes = []
+        exposes_soup = BeautifulSoup(self.exposes_page, "lxml")
+        for expose_container in exposes_soup.find_all("a"):
+            if r"/expose/" in str(expose_container.get("href")):
+                self.exposes.append(
+                    "https://www.immobilienscout24.de" + expose_container.get("href")
+                )
+        self.exposes = list(set(self.exposes))
+        if not self.exposes:
             print("No exposes found on page " + str(self.page))
             self.smooth_exit()
 
-    def get_linkdata(self):
-        for link in self.links:
-            self.link = link
+    def get_expose_data(self):
+        for self.expose in self.exposes:
             try:
-                self.get_linkvalues()
+                self.get_expose_html()
+                self.parse_expose_html()
             except Exception:
-                self.skip_link()
+                self.skip_expose()
 
-    def get_linkvalues(self):
-        pagedata_source = requests.get(self.link).text
-        pagedata_soup = BeautifulSoup(pagedata_source, "lxml")
-        pagedata_values = pagedata_soup.head.find("script", type="text/javascript")
-        pagedata_json = str(pagedata_values).split("keyValues = ")[1].split(";\n")[0]
-        pagedata_dictionary = json.loads(pagedata_json)
-        pagedata_pandas = pd.DataFrame(pagedata_dictionary, index=[str(datetime.now())])
-        self.data = self.data.append(pagedata_pandas)
+    def get_expose_html(self):
+        self.expose_html = requests.get(self.expose).text
+
+    def parse_expose_html(self):
+        expose_soup = BeautifulSoup(self.expose_html, "lxml")
+        expose_jsonlike = expose_soup.head.find("script", type="text/javascript")
+        expose_json = str(expose_jsonlike).split("keyValues = ")[1].split(";\n")[0]
+        expose_dictionary = json.loads(expose_json)
+        expose_pandas = pd.DataFrame(expose_dictionary, index=[str(datetime.now())])
+        self.data = self.data.append(expose_pandas)
 
     def write_data(self):
         print(f"Writing data to {self.filepath}")
@@ -87,14 +96,16 @@ class Scraper:
                 f, sep=";", decimal=",", encoding="utf-8", index_label="timestamp",
             )
 
-    """ Error handling methods """
+    # Error handling methods
 
-    def skip_link(self):
-        print("Error in link " + self.link + ":\n")
+    def skip_expose(self):
+        print("Error in expose " + self.expose + ":\n")
         traceback.print_exc()
-        self.broken_links.append(self.link)
-        if len(self.broken_links) > 100:
-            print("Something is up, too many broken links: " + str(self.broken_links))
+        self.broken_exposes.append(self.expose)
+        if len(self.broken_exposes) > 1000:
+            print(
+                "Something is up, too many broken exposes: " + str(self.broken_exposes)
+            )
             self.smooth_exit()
 
     def smooth_exit(self):
@@ -102,12 +113,7 @@ class Scraper:
         self.write_data()
         raise SystemExit
 
-    def main(self):
-        self.parse()
-        self.set_vars()
-        self.get_data()
-
 
 if __name__ == "__main__":
-    dataset = Scraper()
-    dataset.main()
+    scraper = Scraper()
+    scraper.main()
