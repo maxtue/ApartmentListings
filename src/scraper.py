@@ -1,8 +1,8 @@
+import os
 from pathlib import Path
 import traceback
 import argparse
 from datetime import date
-from datetime import datetime
 
 from bs4 import BeautifulSoup
 import requests
@@ -15,33 +15,34 @@ class Scraper:
 
     # Setter methods
 
-    def __init__(self):
-        self.parse_argparse()
-        self.set_filepath()
+    def __init__(self, listingtype="mieten"):
+        self.listingtype = listingtype
         self.data = pd.DataFrame()
         self.broken_exposes = []
         self.page = 1
 
-    def parse_argparse(self):
+    def parse_args(self):
         parser = argparse.ArgumentParser()
         parser.add_argument(
-            "--type",
+            "--listingtype",
             choices=["mieten", "kaufen"],
             help="chose between 'mieten' and 'kaufen'",
             type=str,
             default="mieten",
         )
-        self.args = parser.parse_args()
+        args = parser.parse_args()
+        self.listingtype = args.listingtype
 
     def set_filepath(self):
-        filename = self.args.type + str(date.today()) + ".csv"
-        savepath = str((Path(__file__).parent.absolute() / "../data/").resolve())
-        Path(savepath).mkdir(parents=True, exist_ok=True)
-        self.filepath = savepath + "/" + filename
+        filename = self.listingtype + str(date.today()) + ".csv"
+        filedir = str((Path(__file__).parent.absolute() / "../data/").resolve())
+        Path(filedir).mkdir(parents=True, exist_ok=True)
+        self.filepath = os.path.join(filedir, filename)
 
     # Getter methods
 
     def main(self):
+        self.set_filepath()
         while True:
             print(f"Scraping results from page {self.page}.")
             self.get_expose_links()
@@ -51,13 +52,13 @@ class Scraper:
     def get_expose_links(self):
         self.exposes_page = requests.get(
             "https://www.immobilienscout24.de/Suche/de/wohnung-"
-            + self.args.type
+            + self.listingtype
             + "?pagenumber="
             + str(self.page)
         ).text
-        self.parse_exposes_page()
+        self.parse_expose_links()
 
-    def parse_exposes_page(self):
+    def parse_expose_links(self):
         self.exposes = []
         exposes_soup = BeautifulSoup(self.exposes_page, "lxml")
         for expose_container in exposes_soup.find_all("a"):
@@ -86,15 +87,14 @@ class Scraper:
         expose_jsonlike = expose_soup.head.find("script", type="text/javascript")
         expose_json = str(expose_jsonlike).split("keyValues = ")[1].split(";\n")[0]
         expose_dictionary = json.loads(expose_json)
-        expose_pandas = pd.DataFrame(expose_dictionary, index=[str(datetime.now())])
-        self.data = self.data.append(expose_pandas)
+        expose_pandas = pd.DataFrame(expose_dictionary, index=[0])
+        self.data = self.data.append(expose_pandas, ignore_index=True)
 
     def write_data(self):
         print(f"Writing data to {self.filepath}")
-        with open(self.filepath, "w") as f:
-            self.data.to_csv(
-                f, sep=";", decimal=",", encoding="utf-8", index_label="timestamp",
-            )
+        self.data.to_csv(
+            self.filepath, sep=";", decimal=",", encoding="utf-8", index=False
+        )
 
     # Error handling methods
 
@@ -116,4 +116,5 @@ class Scraper:
 
 if __name__ == "__main__":
     scraper = Scraper()
+    scraper.parse_args()
     scraper.main()
