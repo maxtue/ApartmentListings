@@ -3,7 +3,7 @@ data/
 3day_data/
 .vscode/
 .DS_Store
-test.*
+test_kaufen.html
 rsync_to_local.app/
 
 # Byte-compiled / optimized / DLL files
