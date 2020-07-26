@@ -2,7 +2,7 @@
 Scrape and analyze apartment listings for rent and sale from Germanys most popular housing website [Immobilienscout24.de](https://www.immobilienscout24.de/) with Python.
 
 ## Motivation
-Get the Apartment listings for all of Germany. The scraper will go through every individual listing expose, exctract the most important parameters and store them in a .csv file.
+Get the apartment listings for all of Germany. The scraper will go through every individual listing expose, exctract the most important parameters and store them in a .csv file.
 
 ## Features
 Visualize median rents and number of listings in a zip code or district over time:
@@ -18,7 +18,11 @@ Gaussian outlier detection:
 ![](data_analysis/sale_outlier.png)
 
 ## Installation
-After cloning the repository you can easily use Pipenv to set up a virtual environment. It will read from Pipfile and Pipfile.lock in the main repository to install all necessary packages:
+After cloning the repository you can use Pipenv to set up a virtual environment. Pipenv itself can be installed with pip:
+```
+pip install pipenv
+```
+Pipenv will read from Pipfile and Pipfile.lock in the main directory to install all other necessary packages:
 ```
 cd ApartmentListings/
 pipenv install
@@ -55,6 +59,3 @@ to be implemented
 
 ## Credits
 Inspired by [this](https://statisquo.de/2017/11/16/immobilienscout24-mining-teil-1-worum-geht-es/) series of blog posts.
-
-## License
-GNU General Public License
