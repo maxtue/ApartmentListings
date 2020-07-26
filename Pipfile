@@ -21,6 +21,7 @@ sklearn = "*"
 numpy = "*"
 torch = "*"
 pytest = "*"
+requests-testadapter = "*"
 
 [requires]
 python_version = "*"
