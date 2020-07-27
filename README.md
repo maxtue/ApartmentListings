@@ -5,11 +5,11 @@ Scrape and analyze apartment listings for rent and sale from Germanys most popul
 Get the apartment listings for all of Germany. The scraper will go through every individual listing expose, exctract the most important parameters and store them in a .csv file.
 
 ## Features
-Visualize median rents and number of listings in a zip code or district over time:
+Median rents over time:
 
 ![](data_analysis/rent_timeseries_plot.png)
 
-Visualize median saleprices and number of listings in a zip code or district over time:
+Median saleprices over time:
 
 ![](data_analysis/sale_timeseries_plot.png)
 
