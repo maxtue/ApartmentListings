@@ -10,6 +10,19 @@ import pandas as pd
 import json
 
 
+def parse_args(self):
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--listingtype",
+        choices=["mieten", "kaufen"],
+        help="chose between 'mieten' and 'kaufen'",
+        type=str,
+        default="mieten",
+    )
+    args = parser.parse_args()
+    return args
+
+
 class Scraper:
     """ A web scraper for apartments on Immobilienscout.de """
 
@@ -17,21 +30,10 @@ class Scraper:
 
     def __init__(self, listingtype="mieten"):
         self.listingtype = listingtype
+        self.set_filepath()
         self.data = pd.DataFrame()
         self.broken_exposes = []
         self.page = 1
-
-    def parse_args(self):
-        parser = argparse.ArgumentParser()
-        parser.add_argument(
-            "--listingtype",
-            choices=["mieten", "kaufen"],
-            help="chose between 'mieten' and 'kaufen'",
-            type=str,
-            default="mieten",
-        )
-        args = parser.parse_args()
-        self.listingtype = args.listingtype
 
     def set_filepath(self):
         filename = self.listingtype + str(date.today()) + ".csv"
@@ -42,7 +44,6 @@ class Scraper:
     # Getter methods
 
     def main(self):
-        self.set_filepath()
         while True:
             print(f"Scraping results from page {self.page}.")
             self.get_expose_links()
@@ -51,10 +52,7 @@ class Scraper:
 
     def get_expose_links(self):
         self.exposes_page = requests.get(
-            "https://www.immobilienscout24.de/Suche/de/wohnung-"
-            + self.listingtype
-            + "?pagenumber="
-            + str(self.page)
+            "https://www.immobilienscout24.de/Suche/de/wohnung-" + self.listingtype + "?pagenumber=" + str(self.page)
         ).text
         self.parse_expose_links()
 
@@ -63,9 +61,7 @@ class Scraper:
         exposes_soup = BeautifulSoup(self.exposes_page, "lxml")
         for expose_container in exposes_soup.find_all("a"):
             if r"/expose/" in str(expose_container.get("href")):
-                self.exposes.append(
-                    "https://www.immobilienscout24.de" + expose_container.get("href")
-                )
+                self.exposes.append("https://www.immobilienscout24.de" + expose_container.get("href"))
         self.exposes = list(set(self.exposes))
         if not self.exposes:
             print("No exposes found on page " + str(self.page))
@@ -92,9 +88,7 @@ class Scraper:
 
     def write_data(self):
         print(f"Writing data to {self.filepath}")
-        self.data.to_csv(
-            self.filepath, sep=";", decimal=",", encoding="utf-8", index=False
-        )
+        self.data.to_csv(self.filepath, sep=";", decimal=",", encoding="utf-8", index=False)
 
     # Error handling methods
 
@@ -103,9 +97,7 @@ class Scraper:
         traceback.print_exc()
         self.broken_exposes.append(self.expose)
         if len(self.broken_exposes) > 1000:
-            print(
-                "Something is up, too many broken exposes: " + str(self.broken_exposes)
-            )
+            print("Something is up, too many broken exposes: " + str(self.broken_exposes))
             self.smooth_exit()
 
     def smooth_exit(self):
@@ -115,6 +107,6 @@ class Scraper:
 
 
 if __name__ == "__main__":
-    scraper = Scraper()
-    scraper.parse_args()
+    args = parse_args()
+    scraper = Scraper(listingtype=args.listingtype)
     scraper.main()
