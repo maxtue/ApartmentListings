@@ -32,7 +32,7 @@ pipenv install
 Run scraper.py in an active Pipenv shell. It will save a .csv file in a new data/ folder in the main repository directory after running:
 ```
 pipenv shell
-cd code/
+cd src/
 python scraper.py
 ```
 Use the --type option to get rent listings (mieten) or sale listings (kaufen)
