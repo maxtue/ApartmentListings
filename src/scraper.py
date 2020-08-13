@@ -3,14 +3,19 @@ from pathlib import Path
 import traceback
 import argparse
 from datetime import date
+import random
 
 from bs4 import BeautifulSoup
-import requests
 import pandas as pd
 import json
+import requests
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+from webdriver_manager.chrome import ChromeDriverManager
+from webdriver_manager.utils import ChromeType
 
 
-def parse_args(self):
+def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--listingtype",
@@ -31,6 +36,7 @@ class Scraper:
     def __init__(self, listingtype="mieten"):
         self.listingtype = listingtype
         self.set_filepath()
+        self.start_selenium_driver()
         self.data = pd.DataFrame()
         self.broken_exposes = []
         self.page = 1
@@ -41,34 +47,46 @@ class Scraper:
         Path(filedir).mkdir(parents=True, exist_ok=True)
         self.filepath = os.path.join(filedir, filename)
 
+    def start_selenium_driver(self):
+        opts = Options()
+        opts.binary_location = "/usr/bin/chromium"
+        opts.headless = True
+        self.driver = webdriver.Chrome(
+            ChromeDriverManager(chrome_type=ChromeType.CHROMIUM).install(), options=opts
+        )
+
     # Getter methods
 
     def main(self):
-        while True:
+        while self.page < 2:
             print(f"Scraping results from page {self.page}.")
             self.get_expose_links()
-            self.get_expose_data()
+            self.parse_expose_links()
+            self.check_expose_links()
+            self.get_exposes()
             self.page += 1
 
     def get_expose_links(self):
-        self.exposes_page = requests.get(
-            "https://www.immobilienscout24.de/Suche/de/wohnung-" + self.listingtype + "?pagenumber=" + str(self.page)
-        ).text
-        self.parse_expose_links()
+        url = f"https://www.immobilienscout24.de/Suche/de/wohnung-{self.listingtype}?pagenumber={self.page}"
+        self.driver.get(url)
 
     def parse_expose_links(self):
-        self.exposes = []
-        exposes_soup = BeautifulSoup(self.exposes_page, "lxml")
-        for expose_container in exposes_soup.find_all("a"):
-            if r"/expose/" in str(expose_container.get("href")):
-                self.exposes.append("https://www.immobilienscout24.de" + expose_container.get("href"))
-        self.exposes = list(set(self.exposes))
-        if not self.exposes:
-            print("No exposes found on page " + str(self.page))
+        self.exposes_links = []
+        for link_container in self.driver.find_elements_by_tag_name("a"):
+            if r"/expose/" in str(link_container.get_attribute("href")):
+                self.exposes_links.append(
+                    "https://www.immobilienscout24.de"
+                    + link_container.get_attribute("href")
+                )
+        self.exposes_links = list(set(self.exposes_links))
+
+    def check_expose_links(self):
+        if not self.exposes_links:
+            print("No exposes_links found on page " + str(self.page))
             self.smooth_exit()
 
-    def get_expose_data(self):
-        for self.expose in self.exposes:
+    def get_exposes(self):
+        for self.expose in self.exposes_links:
             try:
                 self.get_expose_html()
                 self.parse_expose_html()
@@ -88,7 +106,9 @@ class Scraper:
 
     def write_data(self):
         print(f"Writing data to {self.filepath}")
-        self.data.to_csv(self.filepath, sep=";", decimal=",", encoding="utf-8", index=False)
+        self.data.to_csv(
+            self.filepath, sep=";", decimal=",", encoding="utf-8", index=False
+        )
 
     # Error handling methods
 
@@ -97,7 +117,10 @@ class Scraper:
         traceback.print_exc()
         self.broken_exposes.append(self.expose)
         if len(self.broken_exposes) > 1000:
-            print("Something is up, too many broken exposes: " + str(self.broken_exposes))
+            print(
+                "Something is up, too many broken exposes_links: "
+                + str(self.broken_exposes)
+            )
             self.smooth_exit()
 
     def smooth_exit(self):
@@ -109,4 +132,4 @@ class Scraper:
 if __name__ == "__main__":
     args = parse_args()
     scraper = Scraper(listingtype=args.listingtype)
-    scraper.main()
+    # scraper.main()
